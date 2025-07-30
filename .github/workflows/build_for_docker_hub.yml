@@ -19,7 +19,7 @@ jobs:
         run: echo "IMAGE_TAG=${GITHUB_SHA::7}" >> $GITHUB_ENV
 
       - name: Login to Docker Hub
-        run: echo "$DOCKERHUB_TOKEN" | docker login -u "$DOCKERHUB_USER" --password-stdin
+        run: docker login --username "$DOCKERHUB_USER" --password "$DOCKERHUB_TOKEN"
 
       - name: Build Docker image
         run: |
