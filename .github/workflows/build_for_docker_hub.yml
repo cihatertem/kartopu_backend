@@ -23,9 +23,9 @@ jobs:
 
       - name: Build Docker image
         run: |
-          docker build -t ndhakara/kartopu:${{ env.IMAGE_TAG }} -t ndhakara/kartopu:latest .
+          docker build -t ndhakara/kartopu_backend:${{ env.IMAGE_TAG }} -t ndhakara/kartopu_backend:latest .
 
       - name: Push Docker image
         run: |
-          docker push ndhakara/kartopu:${{ env.IMAGE_TAG }}
-          docker push ndhakara/kartopu:latest
+          docker push ndhakara/kartopu_backend:${{ env.IMAGE_TAG }}
+          docker push ndhakara/kartopu_backend:latest
