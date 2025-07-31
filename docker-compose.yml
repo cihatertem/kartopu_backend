@@ -1,22 +1,39 @@
 services:
-  backend-dev:
+  db:
+    image: postgres:17
+    container_name: db
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB_NAME}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+    ports:
+      - ${DB_PORT}:${DB_PORT}
+    networks:
+      - backend
+
+  backend:
     build:
       context: .
       dockerfile: Dockerfile
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB_NAME}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${DB_HOST}:${DB_PORT}/${POSTGRES_DB_NAME}
     command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+    depends_on:
+      - db
     volumes:
       - .:/app
     ports:
       - "11800:8000"
-    profiles:
-      - dev
+    networks:
+      - backend
 
-  backend-prod:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    command: uvicorn app.main:app --host 0.0.0.0 --port 8000
-    ports:
-      - "11800:8000"
-    profiles:
-      - prod
+volumes:
+  pg_data:
+
+networks:
+  backend:
