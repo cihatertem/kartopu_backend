@@ -1,8 +1,12 @@
 from fastapi import FastAPI
 
+from app.routers import user
+
 app = FastAPI()
 
 
-@app.get("/")
-def hello():
-    return {"message": "Good News, Everyone!"}
+app.include_router(
+    user.router,
+    prefix="/users",
+    tags=["users"],
+)

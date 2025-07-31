@@ -1,0 +1,15 @@
+venv/
+.env
+__pycache__/
+swarm/
+*.sqlite3
+*.db
+Dockerfile
+.gitignore
+.git
+.github
+environment.txt
+environments/
+secrets/
+docker-compose*
+README.md

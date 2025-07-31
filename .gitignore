@@ -1,0 +1,7 @@
+venv/
+database.db
+database.sqlite3
+__pycache__/
+secrets/
+swarm/
+environment.txt
