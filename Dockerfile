@@ -4,7 +4,15 @@ LABEL maintainer="Cihat Ertem <cihatertem@gmail.com>"
 
 ENV PYTHONUNBUFFERED=1
 
-RUN groupadd -r app && useradd --no-log-init -r -g app app
+RUN groupadd -g 1000 -r app && useradd -u 1000 --no-log-init -r -g app app
+
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends \
+    build-essential \
+    libpq-dev \
+    && rm -rf /var/lib/apt/lists/* \
+    && apt clean -y \
+    && apt autopurge -y
 
 WORKDIR /app
 

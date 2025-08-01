@@ -6,6 +6,11 @@ services:
       POSTGRES_DB: ${POSTGRES_DB_NAME}
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -V"]
+      interval: 5s
+      retries: 3
+      timeout: 5s
     volumes:
       - pg_data:/var/lib/postgresql/data
     ports:
@@ -24,7 +29,8 @@ services:
       DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${DB_HOST}:${DB_PORT}/${POSTGRES_DB_NAME}
     command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
     depends_on:
-      - db
+      db:
+        condition: service_healthy
     volumes:
       - .:/app
     ports:
