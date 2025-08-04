@@ -2,7 +2,6 @@ from fastapi import FastAPI, Request, status
 from fastapi.responses import JSONResponse
 from sqlalchemy.exc import IntegrityError, NoResultFound
 
-from app.helpers.exceptions import NotFoundException
 from app.routers import user
 
 
@@ -12,14 +11,6 @@ app = FastAPI(
     summary="Yet another blog backend API!",
     version="0.0.1",
 )
-
-
-@app.exception_handler(NotFoundException)
-async def not_found_exception(req: Request, exc: NotFoundException):
-    return JSONResponse(
-        status_code=status.HTTP_404_NOT_FOUND,
-        content={"message": f"{exc.not_found_name.capitalize()} not found!"},
-    )
 
 
 @app.exception_handler(IntegrityError)
