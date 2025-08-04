@@ -24,7 +24,7 @@ async def get_session() -> AsyncGenerator[AsyncSession]:
         yield session
 
 
-DB_SESSION = Annotated[AsyncSession, Depends(get_session)]
+db_session = Annotated[AsyncSession, Depends(get_session)]
 
 
 async def create_tables():

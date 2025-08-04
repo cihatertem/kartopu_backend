@@ -1,69 +1,42 @@
-from fastapi import APIRouter, HTTPException, status
-from sqlmodel import select
-
-from app.db.session import DB_SESSION
+from uuid import UUID
+from fastapi import APIRouter
+from app.crud.user import user_service
 from app.models.user import User
+from app.schemas.user import UserCreate, UserReponseBase, UserUpdate
 
 router = APIRouter()
 
 
-@router.get("/")
-async def read_users(session: DB_SESSION):
-    result = await session.execute(select(User))
-    users = result.scalars().all()
-    return users
+@router.get("/", response_model=list[UserReponseBase])
+async def read_users(
+    service: user_service, limit: int = 15, offset: int = 0
+) -> list[User]:
+    # TODO only admin
+    result = await service.get_all(limit=limit, offset=offset)
+    return result
 
 
-@router.get("/{user_id}")
-async def read_user(user_id: int, session: DB_SESSION):
-    user = await session.get(User, user_id)
-
-    if user:
-        return {"user": user.name}
-
-    raise HTTPException(
-        status_code=status.HTTP_404_NOT_FOUND,
-        detail=("User not found."),
-    )
+@router.get("/{user_id}", response_model=UserReponseBase)
+async def read_user(user_id: UUID, service: user_service):
+    # TODO only admin & user owner
+    user = await service.get_one(user_id)
+    return user
 
 
-@router.post("/")
-async def create_user(user: User, session: DB_SESSION):
-    db_user = User.model_validate(user)
-    session.add(db_user)
-    await session.commit()
-    return db_user
+@router.post("/", response_model=UserReponseBase)
+async def create_user(user_data: UserCreate, service: user_service) -> User:
+    new_user = await service.create(user_data)
+    return new_user
 
 
-@router.patch("/{user_id}")
-async def update_user(user_id: int, session: DB_SESSION, user: User):
-    db_user = await session.get(User, user_id)
-
-    if db_user is None:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail=("User not found."),
-        )
-
-    user_data = user.model_dump(exclude_unset=True)
-    db_user.sqlmodel_update(user_data)
-    session.add(db_user)
-    await session.commit()
-
-    return db_user
+@router.patch("/{user_id}", response_model_exclude_unset=True)
+async def update_user(
+    user_id: UUID, service: user_service, user_data: UserUpdate
+) -> User:
+    updated_user = await service.update(user_id, user_data)
+    return updated_user
 
 
 @router.delete("/{user_id}")
-async def delete_user(user_id: int, session: DB_SESSION):
-    db_user = await session.get(User, user_id)
-
-    if db_user is None:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail=("User not found."),
-        )
-    user_name = db_user.name
-    await session.delete(db_user)
-    await session.commit()
-
-    return {"message": f"User: {user_name.capitalize()} deleted!"}
+async def delete_user(user_id: UUID, service: user_service) -> dict[str, str]:
+    return await service.delete(user_id)
