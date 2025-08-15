@@ -1,6 +1,6 @@
 import uuid
 from sqlmodel import SQLModel, Field
-from pydantic import EmailStr
+from pydantic import ConfigDict, EmailStr
 
 
 class UserBase(SQLModel):
@@ -11,13 +11,12 @@ class UserBase(SQLModel):
     email: EmailStr = Field(unique=True)
 
 
-class UserReponseBase(UserBase):
+class UserResponse(UserBase):
     id: uuid.UUID
 
 
 class UserCreate(UserBase):
-    class Config:  # pyright: ignore reportIncompatibleVariableOverride
-        extra = "forbid"
+    model_config = ConfigDict(extra="forbid")  # type: ignore reportIncompatibleVariableOverride
 
 
 class UserUpdate(SQLModel):
@@ -26,5 +25,4 @@ class UserUpdate(SQLModel):
     username: str | None = None
     email: EmailStr | None = None
 
-    class Config:  # pyright: ignore reportIncompatibleVariableOverride
-        extra = "forbid"
+    model_config = ConfigDict(extra="forbid")  # pyright: ignore reportIncompatibleVariableOverride

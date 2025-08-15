@@ -2,12 +2,12 @@ from uuid import UUID
 from fastapi import APIRouter
 from app.crud.user import user_service
 from app.models.user import User
-from app.schemas.user import UserCreate, UserReponseBase, UserUpdate
+from app.schemas.user import UserCreate, UserResponse, UserUpdate
 
 router = APIRouter()
 
 
-@router.get("/", response_model=list[UserReponseBase])
+@router.get("/", response_model=list[UserResponse])
 async def read_users(
     service: user_service, limit: int = 15, offset: int = 0
 ) -> list[User]:
@@ -16,14 +16,14 @@ async def read_users(
     return result
 
 
-@router.get("/{user_id}", response_model=UserReponseBase)
+@router.get("/{user_id}", response_model=UserResponse)
 async def read_user(user_id: UUID, service: user_service):
     # TODO only admin & user owner
     user = await service.get_one(user_id)
     return user
 
 
-@router.post("/", response_model=UserReponseBase)
+@router.post("/", response_model=UserResponse)
 async def create_user(user_data: UserCreate, service: user_service) -> User:
     new_user = await service.create(user_data)
     return new_user
